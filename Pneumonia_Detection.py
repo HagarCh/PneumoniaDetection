@@ -11,10 +11,11 @@ https://www.kaggle.com/code/homayoonkhadivi/medical-diagnosis-with-cnn-transfer-
 # Importing Various Modules.
 import numpy as np
 import os
+import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-# import cv2
+import cv2
 from keras.preprocessing.image import ImageDataGenerator
 from keras.applications.densenet import DenseNet169
 from keras.layers import Flatten, Dense, Dropout
@@ -22,6 +23,7 @@ from keras import Model
 from sklearn.svm import SVC
 from sklearn.decomposition import PCA
 from sklearn import preprocessing, metrics
+matplotlib.use('TkAgg', force=True)
 
 # Defining operation variable
 os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
@@ -75,22 +77,22 @@ selectedImages = np.random.randint(len(allTrainFiles), size=9)
 
 
 # createlabels - this function convert the label datatype from logical to categorical.
-
 def createlabels(selectedimages, data):
     logicallabels = data.labels[selectedimages]
     categoricallabels = pd.cut(logicallabels, bins=[-1, 0, 1],
                                labels=['normal', 'pneumonia'])
     return categoricallabels
 
-# fig = plt.figure(figsize=(3, 3))
+
+fig = plt.figure(figsize=(3, 3))
 categoricalLabels = createlabels(selectedImages, train)
 
-# for i in range(0, len(selectedImage)):
-#     Image = cv2.imread(allTrainFiles[selectedImage[i]])
-#     fig.add_subplot(3, 3, i + 1)
-#     # showing images
-#     plt.imshow(Image)
-#     plt.title(categoricalLabels[i])
+for i in range(0, len(selectedImages)):
+    Image = cv2.imread(allTrainFiles[selectedImages[i]])
+    fig.add_subplot(3, 3, i + 1)
+    # showing images
+    plt.imshow(Image)
+    plt.title(categoricalLabels[i])
 
 # Feature Extraction using DenseNet
 featureModel = DenseNet169(include_top=False,
@@ -98,8 +100,6 @@ featureModel = DenseNet169(include_top=False,
                            input_tensor=None,
                            input_shape=(224, 224, 3),
                            pooling=None,
-                           # classes=2,
-                           # classifier_activation='softmax'
                            )
 for layer in featureModel.layers:
     layer.trainable = False
@@ -181,4 +181,5 @@ prediction = clf.predict(x_test_features_scaled)
 metrics.accuracy_score(test.classes, prediction)
 print("Accuracy = ", metrics.accuracy_score(test.classes, prediction))
 cm = metrics.confusion_matrix(test.classes, prediction)
-#sns.heatmap(cm, annot=True)
+fig = plt.figure(figsize=(1, 1))
+sns.heatmap(cm, annot=True, fmt="d")
