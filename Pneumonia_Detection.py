@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+
 #Created on Mon Sep 12 16:00:39 2022
 
 #Data derived from https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia
 https://www.kaggle.com/code/homayoonkhadivi/medical-diagnosis-with-cnn-transfer-learning
 #@author: hagar chen
+
 """
 # Importing Various Modules.
 import numpy as np
