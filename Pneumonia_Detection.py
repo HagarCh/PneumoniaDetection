@@ -126,6 +126,7 @@ featureModel.fit(x=train, validation_data=val, epochs=3)
 featureModel = Model(inputs=featureModel.inputs,
                      outputs=featureModel.get_layer(name="dense_1").output)
 # Extract training features from the model
+
 x_for_training = featureModel.predict(train)
 print(x_for_training.shape)
 
@@ -170,10 +171,19 @@ if checkParameters:
             gammaAll.append(gamma)
             CAll.append(C)
             metrics.accuracy_score(test.classes, prediction)
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
+    ax.scatter(CAll, gammaAll, AccAll, c=AccAll, cmap='viridis')
+    ax.set_xlabel('c')
+    ax.set_ylabel(r"$\gamma$")
+    ax.set_zlabel('Accuracy')
+    maxi = np.argmax(AccAll)
+    Text = ["C maximum value:", "%.2f" % CAll[maxi], "    Gamma maximum value:", "%.2f" % gammaAll[maxi]]
+    ax.text2D(0.05, 0.95, ' '.join(Text), transform=ax.transAxes)
 else:
     # Classify the images using svm classifier
     C = 0.1
-    gamma = 7.9
+    gamma = 3
     clf = SVC(kernel='rbf', gamma=gamma, C=C, tol=0.1, class_weight='balanced')
 
 clf.fit(x_for_training_scaled, train.classes)
@@ -181,5 +191,11 @@ prediction = clf.predict(x_test_features_scaled)
 metrics.accuracy_score(test.classes, prediction)
 print("Accuracy = ", metrics.accuracy_score(test.classes, prediction))
 cm = metrics.confusion_matrix(test.classes, prediction)
-fig = plt.figure(figsize=(1, 1))
+ax = plt.axes()
 sns.heatmap(cm, annot=True, fmt="d")
+# labels, title and ticks
+ax.set_xlabel('Predicted labels')
+ax.set_ylabel('True labels')
+ax.set_title('Confusion Matrix')
+ax.xaxis.set_ticklabels(['normal', 'pneumonia'])
+ax.yaxis.set_ticklabels(['normal', 'pneumonia'])
